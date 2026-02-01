@@ -1,136 +1,136 @@
-import Tag from "../models/Tag.js";
+import Category from "../models/Category.js";
 import validateObjectId from "../utils/validateObjectId.js";
 
-export const createTag = async (req, res, next) => {
+export const createCategory = async (req, res, next) => {
   try {
-    // Only admins can create tags
+    // Only admins can create categories
     if (req.user.role !== "admin") {
       return res.status(403).json({
         success: false,
-        error: "Only admins can create tags",
+        error: "Only admins can create categories",
       });
     }
 
-    const tag = await Tag.create(req.body);
+    const category = await Category.create(req.body);
 
     res.status(201).json({
       success: true,
-      data: tag,
+      data: category,
     });
   } catch (error) {
     next(error);
   }
 };
 
-export const getAllTags = async (req, res, next) => {
+export const getAllCategories = async (req, res, next) => {
   try {
-    const tags = await Tag.find().sort({ name: 1 });
+    const categories = await Category.find().sort({ name: 1 });
 
     res.status(200).json({
       success: true,
-      count: tags.length,
-      data: tags,
+      count: categories.length,
+      data: categories,
     });
   } catch (error) {
     next(error);
   }
 };
 
-export const getTagById = async (req, res, next) => {
+export const getCategoryById = async (req, res, next) => {
   try {
     if (!validateObjectId(req.params.id)) {
       return res.status(400).json({
         success: false,
-        error: "Invalid tag ID format",
+        error: "Invalid category ID format",
       });
     }
 
-    const tag = await Tag.findById(req.params.id);
+    const category = await Category.findById(req.params.id);
 
-    if (!tag) {
+    if (!category) {
       return res.status(404).json({
         success: false,
-        error: "Tag not found",
+        error: "Category not found",
       });
     }
 
     res.status(200).json({
       success: true,
-      data: tag,
+      data: category,
     });
   } catch (error) {
     next(error);
   }
 };
 
-export const updateTag = async (req, res, next) => {
+export const updateCategory = async (req, res, next) => {
   try {
-    // Only admins can update tags
+    // Only admins can update categories
     if (req.user.role !== "admin") {
       return res.status(403).json({
         success: false,
-        error: "Only admins can update tags",
+        error: "Only admins can update categories",
       });
     }
 
     if (!validateObjectId(req.params.id)) {
       return res.status(400).json({
         success: false,
-        error: "Invalid tag ID format",
+        error: "Invalid category ID format",
       });
     }
 
-    const tag = await Tag.findByIdAndUpdate(req.params.id, req.body, {
+    const category = await Category.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
       runValidators: true,
     });
 
-    if (!tag) {
+    if (!category) {
       return res.status(404).json({
         success: false,
-        error: "Tag not found",
+        error: "Category not found",
       });
     }
 
     res.status(200).json({
       success: true,
-      data: tag,
+      data: category,
     });
   } catch (error) {
     next(error);
   }
 };
 
-export const deleteTag = async (req, res, next) => {
+export const deleteCategory = async (req, res, next) => {
   try {
-    // Only admins can delete tags
+    // Only admins can delete categories
     if (req.user.role !== "admin") {
       return res.status(403).json({
         success: false,
-        error: "Only admins can delete tags",
+        error: "Only admins can delete categories",
       });
     }
 
     if (!validateObjectId(req.params.id)) {
       return res.status(400).json({
         success: false,
-        error: "Invalid tag ID format",
+        error: "Invalid category ID format",
       });
     }
 
-    const tag = await Tag.findByIdAndDelete(req.params.id);
+    const category = await Category.findByIdAndDelete(req.params.id);
 
-    if (!tag) {
+    if (!category) {
       return res.status(404).json({
         success: false,
-        error: "Tag not found",
+        error: "Category not found",
       });
     }
 
     res.status(200).json({
       success: true,
       data: {},
-      message: "Tag deleted successfully",
+      message: "Category deleted successfully",
     });
   } catch (error) {
     next(error);

@@ -4,7 +4,16 @@ import validateObjectId from "../utils/validateObjectId.js";
 
 export const createNote = async (req, res, next) => {
   try {
+    // Only authenticated users can create notes
+    if (!req.user) {
+      return res.status(401).json({
+        success: false,
+        error: "You must be logged in to create a note",
+      });
+    }
+
     const noteData = { ...req.body };
+    noteData.userId = req.user.id; // Associate note with current user
 
     // Convert tag names to tag IDs
     if (req.body.tags && req.body.tags.length > 0) {
@@ -15,7 +24,7 @@ export const createNote = async (req, res, next) => {
     const note = await Note.create(noteData);
     const populatedNote = await Note.findById(note._id).populate(
       "tags",
-      "name color",
+      "name color"
     );
 
     res.status(201).json({
@@ -31,8 +40,11 @@ export const getAllNotes = async (req, res, next) => {
   try {
     const { category, isPinned, search, tag } = req.query;
 
-    // Build query
+    // Build query - filter by user if authenticated
     let query = {};
+    if (req.user) {
+      query.userId = req.user.id;
+    }
 
     if (category) {
       query.category = category;
@@ -84,10 +96,13 @@ export const getNoteById = async (req, res, next) => {
       });
     }
 
-    const note = await Note.findById(req.params.id).populate(
-      "tags",
-      "name color",
-    );
+    const query = { _id: req.params.id };
+    // Filter by user if authenticated
+    if (req.user) {
+      query.userId = req.user.id;
+    }
+
+    const note = await Note.findOne(query).populate("tags", "name color");
 
     if (!note) {
       return res.status(404).json({
@@ -107,10 +122,31 @@ export const getNoteById = async (req, res, next) => {
 
 export const updateNote = async (req, res, next) => {
   try {
+    // Only authenticated users can update notes
+    if (!req.user) {
+      return res.status(401).json({
+        success: false,
+        error: "You must be logged in to update a note",
+      });
+    }
+
     if (!validateObjectId(req.params.id)) {
       return res.status(400).json({
         success: false,
         error: "Invalid note ID format",
+      });
+    }
+
+    // Check if note belongs to user
+    const noteExists = await Note.findOne({
+      _id: req.params.id,
+      userId: req.user.id,
+    });
+
+    if (!noteExists) {
+      return res.status(403).json({
+        success: false,
+        error: "You can only update your own notes",
       });
     }
 
@@ -130,13 +166,6 @@ export const updateNote = async (req, res, next) => {
       runValidators: true,
     }).populate("tags", "name color");
 
-    if (!note) {
-      return res.status(404).json({
-        success: false,
-        error: "Note not found",
-      });
-    }
-
     res.status(200).json({
       success: true,
       data: note,
@@ -148,6 +177,14 @@ export const updateNote = async (req, res, next) => {
 
 export const deleteNote = async (req, res, next) => {
   try {
+    // Only authenticated users can delete notes
+    if (!req.user) {
+      return res.status(401).json({
+        success: false,
+        error: "You must be logged in to delete a note",
+      });
+    }
+
     if (!validateObjectId(req.params.id)) {
       return res.status(400).json({
         success: false,
@@ -155,14 +192,20 @@ export const deleteNote = async (req, res, next) => {
       });
     }
 
-    const note = await Note.findByIdAndDelete(req.params.id);
+    // Check if note belongs to user
+    const noteExists = await Note.findOne({
+      _id: req.params.id,
+      userId: req.user.id,
+    });
 
-    if (!note) {
-      return res.status(404).json({
+    if (!noteExists) {
+      return res.status(403).json({
         success: false,
-        error: "Note not found",
+        error: "You can only delete your own notes",
       });
     }
+
+    await Note.findByIdAndDelete(req.params.id);
 
     res.status(200).json({
       success: true,

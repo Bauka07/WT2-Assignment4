@@ -1,6 +1,34 @@
 const API_URL = "http://localhost:3000/api";
 
-// DOM Elements
+// Auth state
+let authToken = localStorage.getItem("token");
+let currentUser = localStorage.getItem("userEmail");
+let isLoginMode = true;
+
+// DOM Elements - Pages
+const landingPage = document.getElementById("landingPage");
+const dashboardPage = document.getElementById("dashboardPage");
+
+// DOM Elements - Landing Page
+const openLoginBtn = document.getElementById("openLoginBtn");
+const openRegisterBtn = document.getElementById("openRegisterBtn");
+const heroGetStartedBtn = document.getElementById("heroGetStartedBtn");
+const closeAuthBtn = document.getElementById("closeAuthBtn");
+const authModalOverlay = document.getElementById("authModalOverlay");
+
+// DOM Elements - Auth
+const authModal = document.getElementById("authModal");
+const authForm = document.getElementById("authForm");
+const authEmail = document.getElementById("authEmail");
+const authPassword = document.getElementById("authPassword");
+const authSubmitBtn = document.getElementById("authSubmitBtn");
+const toggleAuthBtn = document.getElementById("toggleAuthBtn");
+const authTitle = document.getElementById("authTitle");
+const authError = document.getElementById("authError");
+const userInfo = document.getElementById("userInfo");
+const logoutBtn = document.getElementById("logoutBtn");
+
+// DOM Elements - Notes
 const noteModal = document.getElementById("noteModal");
 const noteForm = document.getElementById("noteForm");
 const notesContainer = document.getElementById("notesContainer");
@@ -23,11 +51,63 @@ let allTags = [];
 
 // Event Listeners
 document.addEventListener("DOMContentLoaded", () => {
-  loadNotes();
-  loadAllTags();
+  checkAuthStatus();
+  if (authToken) {
+    loadNotes();
+    loadAllTags();
+  }
+});
+
+// Landing page event listeners
+openLoginBtn?.addEventListener("click", () => {
+  isLoginMode = true;
+  showAuthModal();
+});
+
+openRegisterBtn?.addEventListener("click", () => {
+  isLoginMode = false;
+  showAuthModal();
+});
+
+heroGetStartedBtn?.addEventListener("click", () => {
+  isLoginMode = false;
+  showAuthModal();
+});
+
+closeAuthBtn?.addEventListener("click", () => {
+  closeAuthModal();
+});
+
+authModalOverlay?.addEventListener("click", () => {
+  closeAuthModal();
+});
+
+// Auth event listeners
+authForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  await handleAuth();
+});
+
+toggleAuthBtn.addEventListener("click", () => {
+  isLoginMode = !isLoginMode;
+  authTitle.textContent = isLoginMode ? "Welcome Back" : "Create Account";
+  document.querySelector('.auth-subtitle').textContent = isLoginMode 
+    ? "Sign in to access your notes" 
+    : "Register to start taking notes";
+  authSubmitBtn.textContent = isLoginMode ? "Sign In" : "Create Account";
+  toggleAuthBtn.textContent = isLoginMode ? "Create New Account" : "Sign In Instead";
+  authError.textContent = "";
+});
+
+logoutBtn.addEventListener("click", () => {
+  logout();
 });
 
 newNoteBtn.addEventListener("click", () => {
+  if (!authToken) {
+    showAuthModal();
+    return;
+  }
   openModal();
 });
 
@@ -40,7 +120,7 @@ cancelBtn.addEventListener("click", () => {
 });
 
 window.addEventListener("click", (e) => {
-  if (e.target === noteModal) {
+  if (e.target === noteModal || e.target.classList.contains('modal-overlay')) {
     closeModal();
   }
 });
@@ -91,7 +171,117 @@ tagInput.addEventListener("keydown", (e) => {
   }
 });
 
-// Functions
+// ===== Auth Functions =====
+function checkAuthStatus() {
+  const userRole = localStorage.getItem("userRole");
+  const adminLink = document.getElementById("adminPanelLink");
+  
+  if (authToken) {
+    // User is logged in - show dashboard
+    landingPage.style.display = "none";
+    dashboardPage.style.display = "flex";
+    authModal.style.display = "none";
+    userInfo.textContent = currentUser;
+    userInfo.style.display = "block";
+    logoutBtn.style.display = "flex";
+    newNoteBtn.style.display = "flex";
+    notesContainer.style.display = "grid";
+    
+    // Show admin link for admins
+    if (adminLink) {
+      adminLink.style.display = userRole === "admin" ? "flex" : "none";
+    }
+  } else {
+    // User is not logged in - show landing page
+    landingPage.style.display = "block";
+    dashboardPage.style.display = "none";
+    authModal.style.display = "none";
+    userInfo.textContent = "";
+    logoutBtn.style.display = "none";
+    if (adminLink) {
+      adminLink.style.display = "none";
+    }
+  }
+}
+
+function showAuthModal() {
+  authModal.style.display = "flex";
+  authTitle.textContent = isLoginMode ? "Welcome Back" : "Create Account";
+  document.querySelector('.auth-subtitle').textContent = isLoginMode 
+    ? "Sign in to access your notes" 
+    : "Register to start taking notes";
+  authSubmitBtn.textContent = isLoginMode ? "Sign In" : "Create Account";
+  toggleAuthBtn.textContent = isLoginMode ? "Create New Account" : "Sign In Instead";
+  authForm.reset();
+  authError.textContent = "";
+}
+
+function closeAuthModal() {
+  authModal.style.display = "none";
+}
+
+async function handleAuth() {
+  const email = authEmail.value.trim();
+  const password = authPassword.value;
+
+  if (!email || !password) {
+    authError.textContent = "Email and password are required";
+    return;
+  }
+
+  try {
+    const endpoint = isLoginMode ? "login" : "register";
+    const body = {
+      email,
+      password,
+    };
+
+    if (!isLoginMode) {
+      body.passwordConfirm = password;
+    }
+
+    const response = await fetch(`${API_URL}/auth/${endpoint}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
+
+    const result = await response.json();
+
+    if (result.success) {
+      authToken = result.data.token;
+      currentUser = result.data.user.email;
+      const userRole = result.data.user.role;
+      localStorage.setItem("token", authToken);
+      localStorage.setItem("userEmail", currentUser);
+      localStorage.setItem("userRole", userRole);
+      authError.textContent = "";
+      authForm.reset();
+      checkAuthStatus();
+      loadNotes();
+      loadAllTags();
+    } else {
+      authError.textContent = result.error || "Authentication failed";
+    }
+  } catch (error) {
+    console.error("Auth error:", error);
+    authError.textContent = "An error occurred. Please try again.";
+  }
+}
+
+function logout() {
+  authToken = null;
+  currentUser = null;
+  localStorage.removeItem("token");
+  localStorage.removeItem("userEmail");
+  localStorage.removeItem("userRole");
+  notesContainer.innerHTML = "";
+  checkAuthStatus();
+}
+
+// ===== Note Functions =====
 function openModal(note = null) {
   selectedTags = [];
 
@@ -105,9 +295,8 @@ function openModal(note = null) {
     document.getElementById("isPinned").checked = note.isPinned;
 
     if (note.tags && note.tags.length > 0) {
-      // Convert tag objects to tag names
       selectedTags = note.tags.map((tag) =>
-        typeof tag === "string" ? tag : tag.name,
+        typeof tag === "string" ? tag : tag.name
       );
       renderSelectedTags();
     }
@@ -138,7 +327,6 @@ function addTag(tagName) {
   if (!selectedTags.includes(normalizedTag)) {
     selectedTags.push(normalizedTag);
     renderSelectedTags();
-    createTagIfNotExists(normalizedTag);
   }
 
   tagInput.value = "";
@@ -158,7 +346,7 @@ function renderSelectedTags() {
         ${escapeHtml(tag)}
         <button type="button" class="tag-remove" onclick="removeTag('${escapeHtml(tag)}')">&times;</button>
       </span>
-    `,
+    `
     )
     .join("");
 }
@@ -168,7 +356,7 @@ function showTagSuggestions(searchTerm) {
     .filter(
       (tag) =>
         tag.name.toLowerCase().includes(searchTerm) &&
-        !selectedTags.includes(tag.name.toLowerCase()),
+        !selectedTags.includes(tag.name.toLowerCase())
     )
     .slice(0, 5);
 
@@ -179,7 +367,7 @@ function showTagSuggestions(searchTerm) {
         <div class="tag-suggestion-item" onclick="addTag('${escapeHtml(tag.name)}')">
           ${escapeHtml(tag.name)}
         </div>
-      `,
+      `
       )
       .join("");
   } else {
@@ -219,33 +407,6 @@ function updateTagFilter() {
   tagFilter.value = currentValue;
 }
 
-async function createTagIfNotExists(tagName) {
-  const tagExists = allTags.some(
-    (tag) => tag.name.toLowerCase() === tagName.toLowerCase(),
-  );
-
-  if (!tagExists) {
-    try {
-      const response = await fetch(`${API_URL}/tags`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ name: tagName }),
-      });
-
-      const result = await response.json();
-
-      if (result.success) {
-        allTags.push(result.data);
-        updateTagFilter();
-      }
-    } catch (error) {
-      console.error("Error creating tag:", error);
-    }
-  }
-}
-
 async function loadNotes() {
   try {
     let url = `${API_URL}/notes?`;
@@ -262,7 +423,12 @@ async function loadNotes() {
       url += `tag=${currentFilter.tag}&`;
     }
 
-    const response = await fetch(url);
+    const response = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    });
+
     const result = await response.json();
 
     if (result.success) {
@@ -280,22 +446,26 @@ async function loadNotes() {
 
 function displayNotes(notes) {
   if (notes.length === 0) {
-    notesContainer.innerHTML =
-      '<p class="loading">No notes found. Create your first note!</p>';
+    notesContainer.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-state-icon">📝</div>
+        <h3>No notes yet</h3>
+        <p>Create your first note to get started!</p>
+      </div>
+    `;
     return;
   }
 
   notesContainer.innerHTML = notes
     .map(
       (note) => `
-    <div class="note-card ${note.isPinned ? "pinned" : ""}"
-         style="border-left-color: ${note.color}">
-      ${note.isPinned ? '<span class="pin-badge">📌 PINNED</span>' : ""}
+    <div class="note-card ${note.isPinned ? "pinned" : ""}">
+      <div class="note-color-bar" style="background-color: ${note.color}"></div>
 
       <div class="note-title">${escapeHtml(note.title)}</div>
 
       <div class="note-meta">
-        <span class="category-badge">${note.category}</span>
+        <span class="category-badge">${getCategoryIcon(note.category)} ${note.category}</span>
         <span class="note-date">${formatDate(note.createdAt)}</span>
       </div>
 
@@ -305,7 +475,7 @@ function displayNotes(notes) {
               ${note.tags
                 .map((tag) => {
                   const tagName = typeof tag === "string" ? tag : tag.name;
-                  return `<span class="note-tag">${escapeHtml(tagName)}</span>`;
+                  return `<span class="note-tag">#${escapeHtml(tagName)}</span>`;
                 })
                 .join("")}
              </div>`
@@ -315,13 +485,25 @@ function displayNotes(notes) {
       <div class="note-content">${escapeHtml(note.content)}</div>
 
       <div class="note-actions">
-        <button class="btn btn-secondary" onclick="editNote('${note._id}')">Edit</button>
-        <button class="btn btn-danger" onclick="deleteNote('${note._id}')">Delete</button>
+        <button class="btn btn-secondary btn-sm" onclick="editNote('${note._id}')">✏️ Edit</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteNote('${note._id}')">🗑️ Delete</button>
       </div>
     </div>
-  `,
+  `
     )
     .join("");
+}
+
+function getCategoryIcon(category) {
+  const icons = {
+    Work: '💼',
+    Personal: '👤',
+    Ideas: '💡',
+    Study: '📚',
+    Todo: '✅',
+    Other: '📁'
+  };
+  return icons[category] || '📁';
 }
 
 async function saveNote() {
@@ -342,6 +524,7 @@ async function saveNote() {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${authToken}`,
         },
         body: JSON.stringify(noteData),
       });
@@ -350,6 +533,7 @@ async function saveNote() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${authToken}`,
         },
         body: JSON.stringify(noteData),
       });
@@ -364,7 +548,7 @@ async function saveNote() {
     } else {
       alert(
         "Error saving note: " +
-          (result.errors ? result.errors.join(", ") : result.error),
+          (result.errors ? result.errors.join(", ") : result.error)
       );
     }
   } catch (error) {
@@ -375,7 +559,11 @@ async function saveNote() {
 
 async function editNote(id) {
   try {
-    const response = await fetch(`${API_URL}/notes/${id}`);
+    const response = await fetch(`${API_URL}/notes/${id}`, {
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    });
     const result = await response.json();
 
     if (result.success) {
@@ -397,6 +585,9 @@ async function deleteNote(id) {
   try {
     const response = await fetch(`${API_URL}/notes/${id}`, {
       method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
     });
 
     const result = await response.json();

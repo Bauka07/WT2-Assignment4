@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Panel - NotesApp</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/admin.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <div class="admin-wrapper">
+      <!-- Sidebar -->
+      <aside class="admin-sidebar">
+        <div class="admin-sidebar-header">
+          <div class="logo">
+            <span class="logo-icon">⚙️</span>
+            <span class="logo-text">Admin Panel</span>
+          </div>
+        </div>
+        
+        <nav class="admin-nav">
+          <button class="admin-nav-item active" data-section="dashboard">
+            <span class="nav-icon">📊</span>
+            <span>Dashboard</span>
+          </button>
+          <button class="admin-nav-item" data-section="users">
+            <span class="nav-icon">👥</span>
+            <span>Users</span>
+          </button>
+          <button class="admin-nav-item" data-section="notes">
+            <span class="nav-icon">📝</span>
+            <span>All Notes</span>
+          </button>
+          <button class="admin-nav-item" data-section="categories">
+            <span class="nav-icon">📂</span>
+            <span>Categories</span>
+          </button>
+          <button class="admin-nav-item" data-section="tags">
+            <span class="nav-icon">🏷️</span>
+            <span>Tags</span>
+          </button>
+        </nav>
+
+        <div class="admin-sidebar-footer">
+          <a href="/" class="btn btn-outline btn-block">← Back to App</a>
+          <button id="adminLogoutBtn" class="btn btn-ghost btn-block">Logout</button>
+        </div>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="admin-main">
+        <!-- Dashboard Section -->
+        <section id="dashboardSection" class="admin-section active">
+          <div class="section-header">
+            <h1>Dashboard</h1>
+            <p>Overview of your application</p>
+          </div>
+          
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon">👥</div>
+              <div class="stat-info">
+                <span class="stat-value" id="statUsers">0</span>
+                <span class="stat-label">Total Users</span>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">📝</div>
+              <div class="stat-info">
+                <span class="stat-value" id="statNotes">0</span>
+                <span class="stat-label">Total Notes</span>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">📂</div>
+              <div class="stat-info">
+                <span class="stat-value" id="statCategories">0</span>
+                <span class="stat-label">Categories</span>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">🏷️</div>
+              <div class="stat-info">
+                <span class="stat-value" id="statTags">0</span>
+                <span class="stat-label">Tags</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="dashboard-grid">
+            <div class="dashboard-card">
+              <h3>Recent Users</h3>
+              <div id="recentUsersList" class="recent-list"></div>
+            </div>
+            <div class="dashboard-card">
+              <h3>Recent Notes</h3>
+              <div id="recentNotesList" class="recent-list"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Users Section -->
+        <section id="usersSection" class="admin-section">
+          <div class="section-header">
+            <h1>Users Management</h1>
+            <p>Manage all registered users</p>
+          </div>
+          <div class="table-container">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th>Created</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="usersTableBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Notes Section -->
+        <section id="notesSection" class="admin-section">
+          <div class="section-header">
+            <h1>All Notes</h1>
+            <p>View and manage all users' notes</p>
+          </div>
+          <div class="table-container">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Title</th>
+                  <th>User</th>
+                  <th>Category</th>
+                  <th>Created</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="notesTableBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Categories Section -->
+        <section id="categoriesSection" class="admin-section">
+          <div class="section-header">
+            <div>
+              <h1>Categories</h1>
+              <p>Manage note categories</p>
+            </div>
+            <button id="addCategoryBtn" class="btn btn-primary">+ Add Category</button>
+          </div>
+          <div class="table-container">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Icon</th>
+                  <th>Name</th>
+                  <th>Description</th>
+                  <th>Color</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="categoriesTableBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Tags Section -->
+        <section id="tagsSection" class="admin-section">
+          <div class="section-header">
+            <div>
+              <h1>Tags</h1>
+              <p>Manage note tags</p>
+            </div>
+            <button id="addTagBtn" class="btn btn-primary">+ Add Tag</button>
+          </div>
+          <div class="table-container">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Color</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="tagsTableBody"></tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- Edit User Modal -->
+    <div id="editUserModal" class="modal">
+      <div class="modal-overlay"></div>
+      <div class="modal-content modal-sm">
+        <div class="modal-header">
+          <h2>Edit User</h2>
+          <button class="close" data-close="editUserModal">&times;</button>
+        </div>
+        <form id="editUserForm">
+          <input type="hidden" id="editUserId" />
+          <div class="form-group">
+            <label for="editUserEmail">Email</label>
+            <input type="email" id="editUserEmail" required />
+          </div>
+          <div class="form-group">
+            <label for="editUserRole">Role</label>
+            <select id="editUserRole">
+              <option value="user">User</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" data-close="editUserModal">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Category Modal -->
+    <div id="categoryModal" class="modal">
+      <div class="modal-overlay"></div>
+      <div class="modal-content modal-sm">
+        <div class="modal-header">
+          <h2 id="categoryModalTitle">Add Category</h2>
+          <button class="close" data-close="categoryModal">&times;</button>
+        </div>
+        <form id="categoryForm">
+          <input type="hidden" id="categoryId" />
+          <div class="form-group">
+            <label for="categoryName">Name</label>
+            <input type="text" id="categoryName" required maxlength="50" />
+          </div>
+          <div class="form-group">
+            <label for="categoryDescription">Description</label>
+            <textarea id="categoryDescription" rows="2" maxlength="200"></textarea>
+          </div>
+          <div class="form-row-2col">
+            <div class="form-group">
+              <label for="categoryIcon">Icon (Emoji)</label>
+              <input type="text" id="categoryIcon" maxlength="5" placeholder="📁" />
+            </div>
+            <div class="form-group">
+              <label for="categoryColor">Color</label>
+              <input type="color" id="categoryColor" value="#6366f1" />
+            </div>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" data-close="categoryModal">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Tag Modal -->
+    <div id="tagModal" class="modal">
+      <div class="modal-overlay"></div>
+      <div class="modal-content modal-sm">
+        <div class="modal-header">
+          <h2 id="tagModalTitle">Add Tag</h2>
+          <button class="close" data-close="tagModal">&times;</button>
+        </div>
+        <form id="tagForm">
+          <input type="hidden" id="tagId" />
+          <div class="form-group">
+            <label for="tagName">Name</label>
+            <input type="text" id="tagName" required maxlength="30" />
+          </div>
+          <div class="form-group">
+            <label for="tagColor">Color</label>
+            <input type="color" id="tagColor" value="#6366f1" />
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" data-close="tagModal">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script src="js/admin.js"></script>
+  </body>
+</html>

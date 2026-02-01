@@ -2,9 +2,14 @@ import dotenv from "dotenv";
 import express from "express";
 import cors from "cors";
 import connectDB from "./config/database.js";
+
 import errorHandler from "./middleware/errorHandler.js";
+
 import noteRoutes from "./routes/noteRoutes.js";
 import tagRoutes from "./routes/tagRoutes.js";
+import categoryRoutes from "./routes/categoryRoutes.js";
+import authRoutes from "./routes/authRoutes.js";
+import adminRoutes from "./routes/adminRoutes.js";
 
 // Load environment variables
 dotenv.config();
@@ -16,7 +21,12 @@ const app = express();
 connectDB();
 
 // Middleware
-app.use(cors());
+app.use(
+  cors({
+    origin: "*", // для задания норм, потом можно ограничить
+    credentials: false,
+  }),
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -24,6 +34,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
 // API Routes
+app.use("/api/auth", authRoutes);
+app.use("/api/admin", adminRoutes);
+app.use("/api/categories", categoryRoutes);
 app.use("/api/notes", noteRoutes);
 app.use("/api/tags", tagRoutes);
 
@@ -31,8 +44,10 @@ app.use("/api/tags", tagRoutes);
 app.get("/api", (req, res) => {
   res.json({
     message: "Welcome to Notes API",
-    version: "1.0.0",
+    version: "2.0.0",
     endpoints: {
+      auth: "/api/auth (POST /register, POST /login)",
+      categories: "/api/categories",
       notes: "/api/notes",
       tags: "/api/tags",
     },

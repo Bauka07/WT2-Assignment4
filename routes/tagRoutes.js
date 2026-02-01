@@ -7,16 +7,22 @@ import {
   deleteTag,
 } from "../controllers/tagController.js";
 import validateTag from "../middleware/validateTag.js";
+import { authenticate, authorize } from "../middleware/authenticate.js";
 
 const router = express.Router();
 
-// Routes
-router.route("/").post(validateTag, createTag).get(getAllTags);
+// Public routes (GET)
+router.route("/").get(getAllTags);
+router.route("/:id").get(getTagById);
+
+// Protected routes (POST, PUT, DELETE) - Admin only
+router
+  .route("/")
+  .post(authenticate, authorize(["admin"]), validateTag, createTag);
 
 router
   .route("/:id")
-  .get(getTagById)
-  .put(validateTag, updateTag)
-  .delete(deleteTag);
+  .put(authenticate, authorize(["admin"]), validateTag, updateTag)
+  .delete(authenticate, authorize(["admin"]), deleteTag);
 
 export default router;

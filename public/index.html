@@ -1,108 +1,298 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Notes App</title>
+    <title>NotesApp - Organize Your Thoughts</title>
     <link rel="stylesheet" href="css/style.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   </head>
   <body>
-    <div class="container">
-      <header>
-        <h1>📝 My Notes</h1>
-        <button id="newNoteBtn" class="btn btn-primary">+ New Note</button>
-      </header>
+    <!-- Landing Page (shown when not logged in) -->
+    <div id="landingPage" class="landing-page">
+      <nav class="landing-nav">
+        <div class="landing-nav-inner">
+          <div class="logo">
+            <span class="logo-icon">📝</span>
+            <span class="logo-text">NotesApp</span>
+          </div>
+          <div class="nav-buttons">
+            <button id="openLoginBtn" class="btn btn-ghost">Sign In</button>
+            <button id="openRegisterBtn" class="btn btn-primary">Get Started</button>
+          </div>
+        </div>
+      </nav>
 
-      <!-- Filter Section -->
-      <div class="filters">
-        <select id="categoryFilter">
-          <option value="">All Categories</option>
-          <option value="Work">Work</option>
-          <option value="Personal">Personal</option>
-          <option value="Ideas">Ideas</option>
-          <option value="Study">Study</option>
-          <option value="Todo">Todo</option>
-          <option value="Other">Other</option>
-        </select>
-
-        <select id="tagFilter">
-          <option value="">All Tags</option>
-        </select>
-
-        <button id="showPinnedBtn" class="btn btn-secondary">
-          Show Pinned Only
-        </button>
-        <button id="showAllBtn" class="btn btn-secondary">Show All</button>
-      </div>
-
-      <!-- Note Form Modal -->
-      <div id="noteModal" class="modal">
-        <div class="modal-content">
-          <span class="close">&times;</span>
-          <h2 id="modalTitle">Create New Note</h2>
-          <form id="noteForm">
-            <input type="hidden" id="noteId" />
-
-            <div class="form-group">
-              <label for="title">Title *</label>
-              <input type="text" id="title" required />
+      <section class="hero">
+        <div class="hero-content">
+          <h1 class="hero-title">Capture Your Ideas,<br>Organize Your Life</h1>
+          <p class="hero-subtitle">
+            A simple and beautiful note-taking app to help you stay organized. 
+            Create, categorize, and find your notes with ease.
+          </p>
+          <div class="hero-buttons">
+            <button id="heroGetStartedBtn" class="btn btn-primary btn-lg">
+              Start Taking Notes →
+            </button>
+          </div>
+        </div>
+        <div class="hero-image">
+          <div class="demo-cards">
+            <div class="demo-card demo-card-1">
+              <div class="demo-card-color" style="background: #6366f1"></div>
+              <span class="demo-badge">💼 Work</span>
+              <h3>Meeting Notes</h3>
+              <p>Important points from today's standup...</p>
             </div>
-
-            <div class="form-group">
-              <label for="content">Content *</label>
-              <textarea id="content" rows="5" required></textarea>
+            <div class="demo-card demo-card-2">
+              <div class="demo-card-color" style="background: #22c55e"></div>
+              <span class="demo-badge">💡 Ideas</span>
+              <h3>App Concept</h3>
+              <p>New feature ideas for the project...</p>
             </div>
-
-            <div class="form-group">
-              <label for="category">Category *</label>
-              <select id="category" required>
-                <option value="">Select Category</option>
-                <option value="Work">Work</option>
-                <option value="Personal">Personal</option>
-                <option value="Ideas">Ideas</option>
-                <option value="Study">Study</option>
-                <option value="Todo">Todo</option>
-                <option value="Other">Other</option>
-              </select>
+            <div class="demo-card demo-card-3">
+              <div class="demo-card-color" style="background: #f59e0b"></div>
+              <span class="demo-badge">📚 Study</span>
+              <h3>JavaScript Notes</h3>
+              <p>Async/await patterns and best practices...</p>
             </div>
+          </div>
+        </div>
+      </section>
 
+      <section class="features">
+        <h2 class="features-title">Everything you need</h2>
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="feature-icon">📂</div>
+            <h3>Organize by Category</h3>
+            <p>Keep your notes sorted with Work, Personal, Ideas, Study, and more.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">🏷️</div>
+            <h3>Tag Your Notes</h3>
+            <p>Add custom tags to quickly find related notes across categories.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">📌</div>
+            <h3>Pin Important Notes</h3>
+            <p>Keep your most important notes at the top for quick access.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">🎨</div>
+            <h3>Color Code</h3>
+            <p>Personalize your notes with custom colors for visual organization.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">🔒</div>
+            <h3>Secure & Private</h3>
+            <p>Your notes are protected with secure authentication.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">⚡</div>
+            <h3>Fast & Simple</h3>
+            <p>Clean interface designed for quick note-taking without distractions.</p>
+          </div>
+        </div>
+      </section>
+
+      <footer class="landing-footer">
+        <p>© 2026 NotesApp. Built for Web Technologies Assignment.</p>
+      </footer>
+    </div>
+
+    <!-- Auth Modal -->
+    <div id="authModal" class="modal">
+      <div class="auth-modal-overlay" id="authModalOverlay"></div>
+      <div class="auth-container">
+        <div class="auth-card">
+          <button class="close-auth-btn" id="closeAuthBtn">&times;</button>
+          <div class="auth-header">
+            <div class="auth-logo">📝</div>
+            <h2 id="authTitle">Welcome Back</h2>
+            <p class="auth-subtitle">Sign in to access your notes</p>
+          </div>
+          <form id="authForm">
             <div class="form-group">
-              <label for="tagInput">Tags</label>
-              <div class="tag-input-container">
-                <input
-                  type="text"
-                  id="tagInput"
-                  placeholder="Type a tag and press Enter"
-                  autocomplete="off"
-                />
-                <div id="tagSuggestions" class="tag-suggestions"></div>
+              <label for="authEmail">Email Address</label>
+              <div class="input-wrapper">
+                <span class="input-icon">✉️</span>
+                <input type="email" id="authEmail" placeholder="your@email.com" required />
               </div>
-              <div id="selectedTags" class="selected-tags"></div>
             </div>
-
             <div class="form-group">
-              <label for="color">Color</label>
-              <input type="color" id="color" value="#ffffff" />
+              <label for="authPassword">Password</label>
+              <div class="input-wrapper">
+                <span class="input-icon">🔒</span>
+                <input type="password" id="authPassword" placeholder="••••••••" required />
+              </div>
             </div>
-
-            <div class="form-group checkbox-group">
-              <input type="checkbox" id="isPinned" />
-              <label for="isPinned">Pin this note</label>
+            <div id="authError" class="error-message"></div>
+            <button type="submit" class="btn btn-primary btn-block" id="authSubmitBtn">
+              Sign In
+            </button>
+            <div class="auth-divider">
+              <span>or</span>
             </div>
-
-            <div class="form-actions">
-              <button type="submit" class="btn btn-primary">Save Note</button>
-              <button type="button" class="btn btn-secondary" id="cancelBtn">
-                Cancel
-              </button>
-            </div>
+            <button type="button" class="btn btn-outline btn-block" id="toggleAuthBtn">
+              Create New Account
+            </button>
           </form>
         </div>
       </div>
+    </div>
 
-      <!-- Notes Display -->
-      <div id="notesContainer" class="notes-grid">
-        <p class="loading">Loading notes...</p>
+    <!-- Dashboard (shown when logged in) -->
+    <div id="dashboardPage" class="app-wrapper" style="display: none;">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <div class="logo">
+            <span class="logo-icon">📝</span>
+            <span class="logo-text">NotesApp</span>
+          </div>
+        </div>
+        
+        <nav class="sidebar-nav">
+          <button id="newNoteBtn" class="btn btn-primary btn-block new-note-btn">
+            <span>+</span> New Note
+          </button>
+          
+          <div class="nav-section">
+            <h3 class="nav-title">Filters</h3>
+            <button id="showAllBtn" class="nav-item active">
+              <span class="nav-icon">📋</span>
+              <span>All Notes</span>
+            </button>
+            <button id="showPinnedBtn" class="nav-item">
+              <span class="nav-icon">📌</span>
+              <span>Pinned</span>
+            </button>
+          </div>
+          
+          <div class="nav-section">
+            <h3 class="nav-title">Categories</h3>
+            <select id="categoryFilter" class="filter-select">
+              <option value="">All Categories</option>
+              <option value="Work">💼 Work</option>
+              <option value="Personal">👤 Personal</option>
+              <option value="Ideas">💡 Ideas</option>
+              <option value="Study">📚 Study</option>
+              <option value="Todo">✅ Todo</option>
+              <option value="Other">📁 Other</option>
+            </select>
+          </div>
+          
+          <div class="nav-section">
+            <h3 class="nav-title">Tags</h3>
+            <select id="tagFilter" class="filter-select">
+              <option value="">All Tags</option>
+            </select>
+          </div>
+        </nav>
+        
+        <div class="sidebar-footer">
+          <a href="/admin.html" id="adminPanelLink" class="btn btn-outline btn-sm" style="display: none; margin-bottom: 8px;">
+            ⚙️ Admin Panel
+          </a>
+          <div class="user-profile" id="userProfile">
+            <div class="user-avatar">👤</div>
+            <div class="user-details">
+              <span id="userInfo" class="user-email">Not logged in</span>
+            </div>
+          </div>
+          <button id="logoutBtn" class="btn btn-ghost btn-sm">
+            Logout
+          </button>
+        </div>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="main-content">
+        <header class="main-header">
+          <div class="header-left">
+            <h1 class="page-title">My Notes</h1>
+            <p class="page-subtitle">Organize your thoughts and ideas</p>
+          </div>
+        </header>
+
+        <!-- Notes Grid -->
+        <div id="notesContainer" class="notes-grid">
+          <div class="loading-state">
+            <div class="loader"></div>
+            <p>Loading your notes...</p>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- Note Form Modal -->
+    <div id="noteModal" class="modal note-modal">
+      <div class="modal-overlay"></div>
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 id="modalTitle">Create New Note</h2>
+          <button class="close" aria-label="Close">&times;</button>
+        </div>
+        <form id="noteForm">
+          <input type="hidden" id="noteId" />
+          
+          <div class="form-group">
+            <label for="title">Title</label>
+            <input type="text" id="title" placeholder="Enter note title..." required />
+          </div>
+
+          <div class="form-group">
+            <label for="content">Content</label>
+            <textarea id="content" rows="6" placeholder="Write your note content here..." required></textarea>
+          </div>
+
+          <div class="form-row-2col">
+            <div class="form-group">
+              <label for="category">Category</label>
+              <select id="category" required>
+                <option value="">Select Category</option>
+                <option value="Work">💼 Work</option>
+                <option value="Personal">👤 Personal</option>
+                <option value="Ideas">💡 Ideas</option>
+                <option value="Study">📚 Study</option>
+                <option value="Todo">✅ Todo</option>
+                <option value="Other">📁 Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="color">Note Color</label>
+              <input type="color" id="color" value="#ffffff" class="color-input" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="tagInput">Tags</label>
+            <div class="tag-input-container">
+              <input
+                type="text"
+                id="tagInput"
+                placeholder="Type a tag and press Enter"
+                autocomplete="off"
+              />
+              <div id="tagSuggestions" class="tag-suggestions"></div>
+            </div>
+            <div id="selectedTags" class="selected-tags"></div>
+          </div>
+
+          <div class="form-group">
+            <label class="checkbox-wrapper">
+              <input type="checkbox" id="isPinned" />
+              <span class="checkbox-custom"></span>
+              <span class="checkbox-label">📌 Pin this note to top</span>
+            </label>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-ghost" id="cancelBtn">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save Note</button>
+          </div>
+        </form>
       </div>
     </div>
 

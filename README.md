@@ -1,382 +1,340 @@
-# Notes App - Web Technologies 2 (Backend) Assignment 3
-<img width="1881" height="906" alt="image" src="https://github.com/user-attachments/assets/5a953a53-5276-4485-87e5-d7bd5ef2c9de" />
+# Notes App - Assignment 4
 
+A full-stack Notes application with authentication, role-based access control (RBAC), admin panel, and CRUD operations for multiple resources.
 
-A full-stack CRUD application for managing notes with MongoDB Atlas integration.
+## 🎯 Project Overview
 
-## 📋 Project Overview
+This project is a complete Notes Application built with:
+- **Backend**: Node.js, Express.js
+- **Database**: MongoDB (Mongoose ODM)
+- **Authentication**: JWT (JSON Web Tokens)
+- **Password Security**: bcrypt for password hashing
+- **Frontend**: Vanilla JavaScript, HTML5, CSS3
 
-This project is a RESTful API backend for a Notes App built with Node.js, Express.js, and MongoDB. It includes a simple frontend interface for interacting with the API and demonstrates complete CRUD operations for both Notes and Tags.
+## ✨ Features
 
-## 🚀 Installation & Setup
+- ✅ User Registration & Login with JWT
+- ✅ Password hashing with bcrypt
+- ✅ Role-Based Access Control (Admin/User)
+- ✅ Admin Panel with full CRUD for all resources
+- ✅ User-specific notes (each user sees only their notes)
+- ✅ Categories & Tags management
+- ✅ Beautiful landing page for non-authenticated users
+- ✅ Modern responsive UI design
+
+## 📦 Models (Objects)
+
+### 1. User Model
+**Fields:**
+- `email` - String (required, unique, validated)
+- `password` - String (required, hashed with bcrypt)
+- `role` - Enum: "user", "admin" (default: "user")
+- `createdAt`, `updatedAt` - Timestamps
+
+### 2. Note Model (Primary Object)
+**Fields:**
+- `userId` - Reference to User (required)
+- `title` - String (required, max 100 characters)
+- `content` - String (required)
+- `category` - Enum: Work, Personal, Ideas, Study, Todo, Other
+- `isPinned` - Boolean (default: false)
+- `color` - Hex color code (default: #ffffff)
+- `tags` - Array of Tag references
+- `createdAt`, `updatedAt` - Timestamps
+
+### 3. Category Model (Secondary Object)
+**Fields:**
+- `name` - String (required, unique, max 50 characters)
+- `description` - String (max 200 characters)
+- `color` - Hex color code (default: #3b82f6)
+- `icon` - Emoji icon (default: 📂)
+- `createdAt`, `updatedAt` - Timestamps
+
+### 4. Tag Model
+**Fields:**
+- `name` - String (required, unique, max 30 characters)
+- `color` - Hex color code (default: #3b82f6)
+- `createdAt`, `updatedAt` - Timestamps
+
+## 👥 User Roles & Access Control (RBAC)
+
+### Roles:
+1. **User** (default role)
+   - Can register and login
+   - Can CRUD their **own** notes only
+   - Can view categories and tags (read only)
+
+2. **Admin**
+   - All user permissions
+   - Full CRUD on all users
+   - Full CRUD on all notes (any user's)
+   - Full CRUD on categories
+   - Full CRUD on tags
+   - Access to Admin Panel with dashboard
+
+### Access Control Matrix:
+
+| Resource    | GET | POST | PUT | DELETE |
+|-------------|-----|------|-----|--------|
+| **Auth** | Public | Public | - | - |
+| **Notes** | Auth (own) | Auth | Auth (owner) | Auth (owner) |
+| **Categories** | Public | Admin | Admin | Admin |
+| **Tags** | Public | Admin | Admin | Admin |
+| **Admin Panel** | Admin | Admin | Admin | Admin |
+
+## 🚀 Setup Instructions
 
 ### Prerequisites
+- Node.js (v14+)
+- MongoDB (local or Atlas)
+- npm
 
-- Node.js (v14 or higher)
-- MongoDB Atlas account (or local MongoDB installation)
-- Git (optional)
+### Installation
 
-## Postman Test Screenshots
-<img width="1256" height="836" alt="image" src="https://github.com/user-attachments/assets/0952a380-bde9-4528-b34f-3d43aab5eebd" />
-<img width="1298" height="869" alt="image" src="https://github.com/user-attachments/assets/68fdf92c-be88-4a93-b2d5-7cdbfff62e5f" />
-<img width="1099" height="838" alt="image" src="https://github.com/user-attachments/assets/19e76f05-34c6-488a-a2e4-5934ab67b8f0" />
-<img width="1242" height="864" alt="image" src="https://github.com/user-attachments/assets/8dde3049-fedd-42f2-97b3-c71b4f563c6b" />
-<img width="830" height="640" alt="image" src="https://github.com/user-attachments/assets/b45ed8ed-e64a-494e-a051-2eb2ab722669" />
-<img width="1069" height="822" alt="image" src="https://github.com/user-attachments/assets/1b05b3ae-5abd-41fe-a6fc-0dcd1c59aded" />
-<img width="1231" height="873" alt="image" src="https://github.com/user-attachments/assets/2d639456-d72c-46c5-afb1-842dd20fa84e" />
-<img width="1310" height="845" alt="image" src="https://github.com/user-attachments/assets/578868eb-53b1-4bc0-952e-14a605cffc48" />
-<img width="1039" height="609" alt="image" src="https://github.com/user-attachments/assets/0ba53087-e7b6-43f2-82ce-c712b0a2d5dd" />
-
-
-
-### Installation Steps
-
-1. **Navigate to project directory**
-
+1. Clone the repository:
 ```bash
-cd WT3
+git clone <repository-url>
+cd WT4
 ```
 
-2. **Install dependencies**
-
+2. Install dependencies:
 ```bash
 npm install
 ```
 
-3. **Configure environment variables**
-
-Create a `.env` file in the root directory:
-
+3. Create a `.env` file:
 ```env
 PORT=3000
-MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/notesapp?retryWrites=true&w=majority&appName=YourAppName
+MONGODB_URI=mongodb+srv://your-connection-string
+JWT_SECRET=your-secret-key-here
+JWT_EXPIRES_IN=7d
+BCRYPT_SALT_ROUNDS=10
 ```
 
-Replace:
-
-- `username` - Your MongoDB Atlas username
-- `password` - Your MongoDB Atlas password
-- `cluster` - Your cluster address
-- `notesapp` - Your database name
-- `YourAppName` - Your app name
-
-For local MongoDB:
-
-```env
-PORT=3000
-MONGODB_URI=mongodb://localhost:27017/notesapp
-```
-
-4. **Run the application**
-
+4. Seed the database:
 ```bash
-# Development mode (with auto-restart)
-npm run dev
+# Create default categories
+npm run seed:categories
 
-# Production mode
+# Create admin user
+node scripts/createAdmin.js
+```
+
+5. Start the server:
+```bash
+npm run dev
+# or
 npm start
 ```
 
-5. **Access the application**
+The server will start on `http://localhost:3000`
 
-- Frontend Interface: http://localhost:3000
-- API Endpoint: http://localhost:3000/api
-
-## 📁 Project Structure
+## 🔑 Admin Credentials
 
 ```
-WT3/
-├── config/
-│   └── database.js              # MongoDB connection configuration
-├── models/
-│   ├── Note.js                  # Note schema with validation
-│   └── Tag.js                   # Tag schema with validation
-├── routes/
-│   ├── noteRoutes.js            # RESTful routes for notes
-│   └── tagRoutes.js             # RESTful routes for tags
-├── controllers/
-│   ├── noteController.js        # Business logic for notes CRUD
-│   └── tagController.js         # Business logic for tags CRUD
-├── middleware/
-│   ├── validateNote.js          # Request validation for notes
-│   ├── validateTag.js           # Request validation for tags
-│   └── errorHandler.js          # Global error handling
-├── public/
-│   ├── index.html               # Frontend user interface
-│   ├── css/
-│   │   └── style.css           # Application styling
-│   └── js/
-│       └── app.js              # Frontend JavaScript logic
-├── utils/
-│   └── validateObjectId.js      # MongoDB ObjectId validation helper
-├── .env                         # Environment variables (create this)
-├── .gitignore                   # Git ignore file
-├── package.json                 # Project dependencies and scripts
-├── app.js                       # Main application entry point
-└── README.md                    # This file
+Email: bauka@gmail.com
+Password: baukagoi
 ```
 
 ## 📡 API Endpoints
 
-### Notes Endpoints
+### Authentication
+| Method | Endpoint | Description | Access |
+|--------|----------|-------------|--------|
+| POST | `/api/auth/register` | Register new user | Public |
+| POST | `/api/auth/login` | Login & get token | Public |
+| GET | `/api/auth/me` | Get current user | Auth |
 
-| Method | Endpoint         | Description                           | Status Codes                           |
-| ------ | ---------------- | ------------------------------------- | -------------------------------------- |
-| POST   | `/api/notes`     | Create a new note                     | 201 Created, 400 Bad Request           |
-| GET    | `/api/notes`     | Get all notes (with optional filters) | 200 OK                                 |
-| GET    | `/api/notes/:id` | Get single note by MongoDB ID         | 200 OK, 404 Not Found                  |
-| PUT    | `/api/notes/:id` | Update existing note by ID            | 200 OK, 404 Not Found, 400 Bad Request |
-| DELETE | `/api/notes/:id` | Delete note by ID                     | 200 OK, 404 Not Found                  |
+### Notes
+| Method | Endpoint | Description | Access |
+|--------|----------|-------------|--------|
+| GET | `/api/notes` | Get user's notes | Auth |
+| GET | `/api/notes/:id` | Get single note | Auth (owner) |
+| POST | `/api/notes` | Create note | Auth |
+| PUT | `/api/notes/:id` | Update note | Auth (owner) |
+| DELETE | `/api/notes/:id` | Delete note | Auth (owner) |
 
-### Query Parameters for GET /api/notes
+### Categories
+| Method | Endpoint | Description | Access |
+|--------|----------|-------------|--------|
+| GET | `/api/categories` | Get all categories | Public |
+| GET | `/api/categories/:id` | Get single category | Public |
+| POST | `/api/categories` | Create category | Admin |
+| PUT | `/api/categories/:id` | Update category | Admin |
+| DELETE | `/api/categories/:id` | Delete category | Admin |
 
-- `category` - Filter by category (Work, Personal, Ideas, Study, Todo, Other)
-- `isPinned` - Filter by pinned status (true/false)
-- `search` - Full-text search in title and content
+### Tags
+| Method | Endpoint | Description | Access |
+|--------|----------|-------------|--------|
+| GET | `/api/tags` | Get all tags | Public |
+| GET | `/api/tags/:id` | Get single tag | Public |
+| POST | `/api/tags` | Create tag | Admin |
+| PUT | `/api/tags/:id` | Update tag | Admin |
+| DELETE | `/api/tags/:id` | Delete tag | Admin |
 
-**Example:**
+### Admin Panel API
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/admin/dashboard` | Get stats & recent activity |
+| GET | `/api/admin/users` | Get all users |
+| GET | `/api/admin/users/:id` | Get single user |
+| PUT | `/api/admin/users/:id` | Update user (role, email) |
+| DELETE | `/api/admin/users/:id` | Delete user & their notes |
+| GET | `/api/admin/notes` | Get ALL users' notes |
+| DELETE | `/api/admin/notes/:id` | Delete any note |
+| POST | `/api/admin/categories` | Create category |
+| PUT | `/api/admin/categories/:id` | Update category |
+| DELETE | `/api/admin/categories/:id` | Delete category |
+| POST | `/api/admin/tags` | Create tag |
+| PUT | `/api/admin/tags/:id` | Update tag |
+| DELETE | `/api/admin/tags/:id` | Delete tag |
+
+## 📁 Project Structure (MVC Pattern)
 
 ```
-GET /api/notes?category=Work&isPinned=true
+WT4/
+├── app.js                    # Application entry point
+├── package.json
+├── .env                      # Environment variables
+│
+├── config/
+│   └── database.js           # MongoDB connection
+│
+├── controllers/
+│   ├── adminController.js    # Admin CRUD operations
+│   ├── authController.js     # Auth logic (register, login)
+│   ├── categoryController.js
+│   ├── noteController.js
+│   └── tagController.js
+│
+├── middleware/
+│   ├── authenticate.js       # JWT verification & RBAC
+│   ├── errorHandler.js       # Global error handler
+│   ├── validateCategory.js
+│   ├── validateNote.js
+│   └── validateTag.js
+│
+├── models/
+│   ├── Category.js
+│   ├── Note.js
+│   ├── Tag.js
+│   └── User.js               # With bcrypt password hashing
+│
+├── routes/
+│   ├── adminRoutes.js        # Admin panel routes
+│   ├── authRoutes.js
+│   ├── categoryRoutes.js
+│   ├── noteRoutes.js
+│   └── tagRoutes.js
+│
+├── scripts/
+│   ├── createAdmin.js        # Create admin user
+│   ├── makeAdmin.js          # Promote user to admin
+│   └── seedCategories.js     # Seed default categories
+│
+├── utils/
+│   └── validateObjectId.js
+│
+└── public/                   # Frontend
+    ├── index.html            # Main app with landing page
+    ├── admin.html            # Admin panel
+    ├── css/
+    │   ├── style.css         # Main styles
+    │   └── admin.css         # Admin panel styles
+    └── js/
+        ├── app.js            # Main app logic
+        └── admin.js          # Admin panel logic
 ```
 
-### Tags Endpoints
+## 🔒 Security Features
 
-| Method | Endpoint        | Description          | Status Codes                           |
-| ------ | --------------- | -------------------- | -------------------------------------- |
-| POST   | `/api/tags`     | Create a new tag     | 201 Created, 400 Bad Request           |
-| GET    | `/api/tags`     | Get all tags         | 200 OK                                 |
-| GET    | `/api/tags/:id` | Get single tag by ID | 200 OK, 404 Not Found                  |
-| PUT    | `/api/tags/:id` | Update tag by ID     | 200 OK, 404 Not Found, 400 Bad Request |
-| DELETE | `/api/tags/:id` | Delete tag by ID     | 200 OK, 404 Not Found                  |
+1. **Password Hashing**: bcrypt with configurable salt rounds
+2. **JWT Authentication**: Secure token-based auth (7 days expiry)
+3. **Role-Based Access Control**: Admin and User roles
+4. **Input Validation**: Server-side validation middleware
+5. **Error Handling**: Centralized error handler
+6. **Protected Routes**: Middleware guards for authenticated routes
+
+## 🖥️ Frontend Pages
+
+### 1. Landing Page (/)
+- Hero section with app description
+- Features showcase
+- Sign In / Register buttons
+- Shown to non-authenticated users
+
+### 2. Dashboard (/)
+- Sidebar with navigation
+- Notes grid with CRUD operations
+- Filter by category and tags
+- Pin/unpin notes
+- Color-coded notes
+- Admin panel link (for admins)
+
+### 3. Admin Panel (/admin.html)
+- Dashboard with stats
+- Users management table
+- Notes management (all users)
+- Categories CRUD
+- Tags CRUD
 
 ## 🧪 Testing with Postman
 
-### 1. Create a Note
+### 1. Register a User
+```http
+POST http://localhost:3000/api/auth/register
+Content-Type: application/json
 
+{
+  "email": "user@test.com",
+  "password": "password123",
+  "passwordConfirm": "password123"
+}
+```
+
+### 2. Login
+```http
+POST http://localhost:3000/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "user@test.com",
+  "password": "password123"
+}
+```
+
+### 3. Create a Note
 ```http
 POST http://localhost:3000/api/notes
+Authorization: Bearer <your-token>
 Content-Type: application/json
 
 {
-  "title": "Learn MongoDB",
-  "content": "Study MongoDB aggregation pipeline and indexing",
-  "category": "Study",
-  "isPinned": true,
-  "color": "#4CAF50"
+  "title": "My First Note",
+  "content": "This is the content",
+  "category": "Work"
 }
 ```
 
-**Response (201 Created):**
-
-```json
-{
-  "success": true,
-  "data": {
-    "_id": "60f7b3b3b3b3b3b3b3b3b3b3",
-    "title": "Learn MongoDB",
-    "content": "Study MongoDB aggregation pipeline and indexing",
-    "category": "Study",
-    "isPinned": true,
-    "color": "#4CAF50",
-    "tags": [],
-    "createdAt": "2026-01-18T10:00:00.000Z",
-    "updatedAt": "2026-01-18T10:00:00.000Z"
-  }
-}
-```
-
-### 2. Get All Notes
-
+### 4. Admin - Get All Users
 ```http
-GET http://localhost:3000/api/notes
+GET http://localhost:3000/api/admin/users
+Authorization: Bearer <admin-token>
 ```
 
-**Response (200 OK):**
+## 📜 NPM Scripts
 
-```json
-{
-  "success": true,
-  "count": 5,
-  "data": [
-    {
-      "_id": "60f7b3b3b3b3b3b3b3b3b3b3",
-      "title": "Learn MongoDB",
-      "content": "Study MongoDB aggregation pipeline",
-      "category": "Study",
-      "isPinned": true,
-      "color": "#4CAF50",
-      "tags": [],
-      "createdAt": "2026-01-18T10:00:00.000Z",
-      "updatedAt": "2026-01-18T10:00:00.000Z"
-    }
-  ]
-}
+```bash
+npm start           # Start production server
+npm run dev         # Start with nodemon (development)
+npm run seed:categories  # Seed default categories
+npm run make:admin  # Promote user to admin (npm run make:admin email@example.com)
 ```
 
-### 3. Get Single Note
+## 👨‍💻 Author
 
-```http
-GET http://localhost:3000/api/notes/60f7b3b3b3b3b3b3b3b3b3b3
-```
+**Bauka** - Web Technologies 2, Assignment 4
 
-### 4. Update a Note
+---
 
-```http
-PUT http://localhost:3000/api/notes/60f7b3b3b3b3b3b3b3b3b3b3
-Content-Type: application/json
-
-{
-  "title": "Master MongoDB",
-  "content": "Complete MongoDB certification",
-  "category": "Study",
-  "isPinned": false,
-  "color": "#2196F3"
-}
-```
-
-### 5. Delete a Note
-
-```http
-DELETE http://localhost:3000/api/notes/60f7b3b3b3b3b3b3b3b3b3b3
-```
-
-**Response (200 OK):**
-
-```json
-{
-  "success": true,
-  "data": {},
-  "message": "Note deleted successfully"
-}
-```
-
-### 6. Create a Tag
-
-```http
-POST http://localhost:3000/api/tags
-Content-Type: application/json
-
-{
-  "name": "urgent",
-  "color": "#FF5722"
-}
-```
-
-### 7. Filter Notes
-
-```http
-GET http://localhost:3000/api/notes?category=Work
-GET http://localhost:3000/api/notes?isPinned=true
-GET http://localhost:3000/api/notes?search=MongoDB
-```
-
-## Validation Rules
-
-### Note Validation
-
-- **Title**: Required, max 100 characters, trimmed
-- **Content**: Required, trimmed
-- **Category**: Required, must be one of: Work, Personal, Ideas, Study, Todo, Other
-- **Color**: Optional, must be valid hex color code (#RRGGBB)
-- **isPinned**: Optional, boolean value
-- **Tags**: Optional, array of valid MongoDB ObjectIds
-
-### Tag Validation
-
-- **Name**: Required, unique, max 30 characters, automatically converted to lowercase
-- **Color**: Optional, must be valid hex color code (#RRGGBB), defaults to #3b82f6
-
-### Error Response Format
-
-```json
-{
-  "success": false,
-  "errors": [
-    "Title is required",
-    "Category must be one of: Work, Personal, Ideas, Study, Todo, Other"
-  ]
-}
-```
-
-Or for single errors:
-
-```json
-{
-  "success": false,
-  "error": "Note not found"
-}
-```
-
-## 🔧 Error Handling
-
-The API uses proper HTTP status codes and returns consistent error responses:
-
-| Status Code | Meaning                                            |
-| ----------- | -------------------------------------------------- |
-| 200         | Success (GET, PUT, DELETE)                         |
-| 201         | Created (POST)                                     |
-| 400         | Bad Request (validation errors, invalid ID format) |
-| 404         | Not Found (resource doesn't exist)                 |
-| 500         | Server Error (database errors, unexpected errors)  |
-
-### Error Types Handled:
-
-- **Validation Errors**: Missing required fields, invalid data formats
-- **Duplicate Key Errors**: Attempting to create duplicate unique values
-- **Cast Errors**: Invalid MongoDB ObjectId format
-- **Not Found Errors**: Resource doesn't exist in database
-- **Database Connection Errors**: MongoDB connection issues
-
-## 🛠️ Technologies Used
-
-### Backend
-
-- **Node.js** - Runtime environment
-- **Express.js v5.2.1** - Web framework
-- **Mongoose v9.1.3** - MongoDB ODM
-- **dotenv v17.2.3** - Environment variable management
-- **CORS v2.8.5** - Cross-Origin Resource Sharing
-
-### Frontend
-
-- **HTML5** - Structure
-- **CSS3** - Styling with gradients and animations
-- **Vanilla JavaScript** - Client-side logic and API interaction
-
-### Database
-
-- **MongoDB Atlas** - Cloud-hosted NoSQL database
-
-### Development Tools
-
-- **Nodemon v3.1.11** - Auto-restart server during development
-- **Postman** - API testing
-
-## 📊 Database Schema
-
-### Note Schema
-
-```javascript
-{
-  title: String (required, max 100 chars),
-  content: String (required),
-  category: String (required, enum),
-  isPinned: Boolean (default: false),
-  color: String (hex format, default: #ffffff),
-  tags: [ObjectId] (ref: Tag),
-  createdAt: Date (auto),
-  updatedAt: Date (auto)
-}
-```
-
-### Tag Schema
-
-```javascript
-{
-  name: String (required, unique, lowercase, max 30 chars),
-  color: String (hex format, default: #3b82f6),
-  createdAt: Date (auto),
-  updatedAt: Date (auto)
-}
-```
+© 2025 NotesApp. All rights reserved.
