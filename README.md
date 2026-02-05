@@ -3,6 +3,12 @@
 A full-stack Notes application with authentication, role-based access control (RBAC), admin panel, and CRUD operations for multiple resources.
 
 <img width="1920" height="775" alt="image" src="https://github.com/user-attachments/assets/23cd80fa-cd1c-46b9-8427-0a544b11bf9f" />
+<img width="1920" height="916" alt="image" src="https://github.com/user-attachments/assets/dbdb48ef-e72b-440b-81c7-6758bfac5e6c" />
+<img width="1920" height="889" alt="image" src="https://github.com/user-attachments/assets/591e53f4-2816-4c63-9144-bc81352a4ac3" />
+<img width="1916" height="851" alt="image" src="https://github.com/user-attachments/assets/613f99a7-121b-473c-bf15-e522434be2c4" />
+<img width="1920" height="899" alt="image" src="https://github.com/user-attachments/assets/9028d32b-6d3e-4a11-ac97-f80e65f80a81" />
+<img width="1920" height="862" alt="image" src="https://github.com/user-attachments/assets/3df998f8-39f6-420f-bf51-01d6a25fdf2a" />
+
 
 <img width="1920" height="898" alt="image" src="https://github.com/user-attachments/assets/b7c87b47-4ba7-4dc8-97b9-2b548b5d65da" />
 
